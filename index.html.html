@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Analysis</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-8.2 -15 130 130'%3E%3Cpath fill='%23642dd8' d='M88.9 4.4L37.0 31.5L37.3 48.5L54.8 56.7L55.1 40.1L55.7 39.3L89.4 22.1L95.9 25.3L96.2 68.0L68.1 81.7L68.2 98.6L114.2 76.8L114.2 16.7ZM33.5 -0.5L-0.6 17.4L-0.6 80.5L40.7 100.5L40.8 83.2L17.5 72.0L17.8 25.8L51.6 7.9Z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Poppins:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script>/* theme: apply the saved choice before anything is painted (no white flash) */
+(function(){try{if(localStorage.getItem("cwi-theme")==="dark")document.documentElement.setAttribute("data-theme","dark")}catch(e){}})();</script>
+<style>
+
+  /* ============ SHARED GLOBAL RESET (used by both screens) ============ */
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{overflow-x:hidden; -webkit-font-smoothing:antialiased;}
+  #loginScreen, #dashboardScreen{min-height:100vh;}
+  /* ============ DASHBOARD SCREEN STYLES (scoped to #dashboardScreen) ============ */
+#dashboardScreen{
+
+    --purple-950:#170733;
+    --purple-900:#22103f;
+    --purple-850:#2b1552;
+    --purple-700:#4c1d95;
+    --purple-600:#6d28d9;
+    --purple-500:#7c3aed;
+    --purple-400:#9c6bf0;
+    --purple-300:#c6a9f7;
+    --purple-200:#e1d3fb;
+    --purple-100:#ede4fc;
+    --purple-50:#f7f3fe;
+    --ink:#271447;
+    --muted:#8478a3;
+    --muted-2:#a99bc7;
+    --green:#1fae60;
+    --green-bg:#e6f8ee;
+    --gray-400:#9a93ad;
+    --gray-bg:#f1eef6;
+    --white:#ffffff;
+    --radius-xl:28px;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --shadow-sm:0 2px 10px rgba(76,29,149,.06);
+    --shadow-md:0 10px 30px rgba(76,29,149,.12);
+    --font-ar:'Tajawal', 'Segoe UI', system-ui, sans-serif;
+    --font-hand:'Caveat', cursive;
+  
+}
+#dashboardScreen *{box-sizing:border-box; margin:0; padding:0;}
+#dashboardScreen{
+    font-family:var(--font-ar);
+    color:var(--ink);
+    background:#fbfaff;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+#dashboardScreen ul{list-style:none;}
+#dashboardScreen a{color:inherit; text-decoration:none;}
+#dashboardScreen button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+#dashboardScreen input{font-family:inherit;}
+#dashboardScreen svg{display:block;}
+#dashboardScreen .icon{width:20px; height:20px; flex-shrink:0;}
+/* ============ APP SHELL ============ */
+#dashboardScreen .app-shell{
+    display:flex;
+    direction:ltr; /* physical placement only: sidebar -> left, main -> right, matching the screenshot */
+    min-height:100vh;
+    width:100%;
+  }
+/* ============ MAIN AREA ============ */
+#dashboardScreen .main-area{
+    direction:rtl;
+    flex:1;
+    min-width:0;
+    background:
+      radial-gradient(700px 420px at 85% -10%, rgba(196,169,247,.35), transparent 60%),
+      linear-gradient(180deg,#f5f1fd 0%, #fbfaff 30%, #ffffff 100%);
+  }
+/* ---- Topbar ---- */
+#dashboardScreen .topbar{
+    display:flex; align-items:center; gap:18px;
+    padding:26px 40px 10px;
+  }
+#dashboardScreen .topbar .spacer{flex:1;}
+#dashboardScreen .header-actions{display:flex; align-items:center; gap:16px;}
+#dashboardScreen .icon-btn{
+    position:relative;
+    width:44px; height:44px; border-radius:14px;
+    background:var(--white);
+    box-shadow:var(--shadow-sm);
+    display:flex; align-items:center; justify-content:center;
+    color:#6b5c8a;
+    transition:box-shadow .15s ease, transform .15s ease;
+  }
+#dashboardScreen .icon-btn:hover{box-shadow:var(--shadow-md); transform:translateY(-1px);}
+#dashboardScreen .icon-btn .dot{
+    position:absolute; top:9px; left:9px;
+    width:8px; height:8px; border-radius:50%;
+    background:#ef4444; border:2px solid #fff;
+  }
+#dashboardScreen .content{padding:14px 40px 48px;}
+
+@media (max-width:860px){
+#dashboardScreen .topbar{padding:20px 20px 6px; gap:12px;}
+#dashboardScreen .content{padding:10px 20px 40px;}
+#dashboardScreen .header-actions{gap:10px;}
+#dashboardScreen .icon-btn{width:38px; height:38px; border-radius:11px;}
+}
+@media (max-width:480px){
+#dashboardScreen .topbar{padding:16px 14px 6px; gap:8px;}
+#dashboardScreen .content{padding:8px 14px 32px;}
+#dashboardScreen .header-actions{gap:6px;}
+#dashboardScreen .icon-btn{width:34px; height:34px; border-radius:10px;}
+#dashboardScreen .icon-btn .icon{width:16px; height:16px;}
+}
+
+/* ===== Ad Analysis ===== */
+/* KPI ANALYZER — every rule is scoped to #kpiApp */
+#kpiApp{--ink:#0f1f2e;--mut:#5b6b7b;--line:#e2e8ef;--bg:#f3f6f9;--brand:#632cd8;--brand2:#4b1fb0;--g:#12805c;--gb:#e4f5ec;--y:#946400;--yb:#fff2cc;--r:#c32f2f;--rb:#fde6e6;--o:#b9530a;--ob:#ffe8d4;--n:#5b6b7b;--nb:#edf1f5}
+#kpiApp *{box-sizing:border-box}
+#kpiApp{margin:0;color:var(--ink);font:15px/1.5 'Poppins','Tajawal',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+#kpiApp .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+#kpiApp .panel{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:0 1px 2px rgba(15,31,46,.04)}
+#kpiApp .panel>h2{font-size:17px;margin:0 0 4px}
+#kpiApp .panel>p.hint{margin:0 0 16px;color:var(--mut);font-size:13px}
+#kpiApp .panel{--pa:#632cd8;--pt:#efe6fd;--pd:#4b1fb0;border-top:5px solid var(--pa);background:linear-gradient(180deg,var(--pt) 0,rgba(255,255,255,.93) 170px)}
+#kpiApp .panel>h2,#kpiApp .panel .row h2{color:var(--pd)}
+#kpiApp .c2{--pa:#2563eb;--pt:#e3ecff;--pd:#1d4ed8}
+#kpiApp .c3{--pa:#0d9488;--pt:#d9f4ef;--pd:#0f766e}
+#kpiApp .c4{--pa:#d97706;--pt:#ffefd0;--pd:#b45309}
+#kpiApp .c5{--pa:#db2777;--pt:#fde3ef;--pd:#be185d}
+#kpiApp .c6{--pa:#0891b2;--pt:#dbf3fa;--pd:#0e7490}
+#kpiApp .c7{--pa:#475569;--pt:#e6ecf3;--pd:#334155}
+#kpiApp .cc{border:1px solid var(--line);border-left:6px solid var(--ca,#632cd8);border-radius:14px;padding:16px;margin-bottom:14px;background:linear-gradient(90deg,var(--ct,#f0e8fe) 0,#fbfcfd 300px)}
+#kpiApp .cc h3{color:var(--ca,#632cd8)}
+#kpiApp .cc.a1{--ca:#2563eb;--ct:#e5edff}
+#kpiApp .cc.a2{--ca:#0d9488;--ct:#dbf4ef}
+#kpiApp .cc.a3{--ca:#d97706;--ct:#ffefd2}
+#kpiApp .coach{position:relative;display:grid;grid-template-columns:190px 1fr;gap:40px;align-items:center;margin:8px 0 48px;padding:38px 42px 32px 40px;border-radius:34px;border:1px solid #e6e0f7;font-family:'Plus Jakarta Sans','Poppins',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:radial-gradient(55% 80% at 100% 0%,#f3efff 0,transparent 70%),linear-gradient(180deg,#fff,#fcfbff);box-shadow:0 30px 60px -36px rgba(91,61,245,.38),0 2px 6px rgba(20,18,58,.04);overflow:hidden}
+#kpiApp .cph{position:relative;justify-self:center;width:176px;padding-bottom:22px}
+#kpiApp .cph::before{content:"";position:absolute;z-index:0;inset:-26px -26px -4px -40px;border-radius:42px;background:linear-gradient(150deg,#dccffb 0,#e9e2fe 55%,#f6f3ff 100%);transform:rotate(-4deg)}
+#kpiApp .cph::after{content:"";position:absolute;z-index:0;left:14%;right:14%;bottom:-10px;height:34px;border-radius:50%;background:rgba(111,78,245,.3);filter:blur(16px)}
+#kpiApp .cring{position:relative;z-index:1;width:100%;aspect-ratio:5/6;padding:4px;border-radius:24px;background:#fff;box-shadow:0 22px 38px -16px rgba(91,61,245,.5)}
+#kpiApp .cring img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 20%;border-radius:20px;background:#eee}
+#kpiApp .cbadge{position:absolute;z-index:2;left:50%;bottom:0;transform:translateX(-50%);white-space:nowrap;display:inline-flex;gap:9px;align-items:center;background:#fff;color:#14123a;font-weight:600;font-size:14px;padding:9px 20px;border-radius:999px;box-shadow:0 14px 26px -10px rgba(91,61,245,.5),0 2px 6px rgba(20,18,58,.06)}
+#kpiApp .cdot{width:11px;height:11px;border-radius:50%;background:#2fc759}
+#kpiApp .cart{position:absolute;top:8px;right:28px;width:190px;height:auto;pointer-events:none}
+#kpiApp .cbody{position:relative;min-width:0}
+#kpiApp .cbody .ceyebrow{margin:0 0 10px;font-size:11.5px;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:#5b3df5}
+#kpiApp .cbody h2{margin:0 0 10px;font-size:26px;font-size:clamp(22px,2.35cqw,27px);line-height:1.18;letter-spacing:-.02em;font-weight:800;text-transform:none;color:#14123a}
+#kpiApp .cbody p.cdesc{margin:0;max-width:520px;font-size:15.5px;font-weight:400;line-height:1.6;color:#6b6a80}
+#kpiApp .cfeat{display:flex;flex-wrap:nowrap;margin-top:24px}
+#kpiApp .cf{position:relative;display:flex;align-items:center;gap:12px;flex:0 1 auto;min-width:0;padding:0 26px}
+#kpiApp .cf:first-child{padding-left:0}
+#kpiApp .cf+.cf::before{content:"";position:absolute;left:0;top:50%;width:1px;height:42px;transform:translateY(-50%);background:#e8e4f4}
+#kpiApp .cfi{flex:none;width:44px;height:44px;border-radius:50%;background:#f2eefe;color:#5b3df5;display:grid;place-items:center}
+#kpiApp .cfi svg{width:21px;height:21px}
+#kpiApp .cf b{display:block;font-size:14px;font-weight:700;color:#14123a}
+#kpiApp .cf small{display:block;font-size:12.5px;font-weight:400;color:#6b6a80}
+#kpiApp .cfoot{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-top:22px;padding-top:20px;border-top:1px solid #ece8f6}
+#kpiApp .creset{margin-right:auto;padding:6px 2px;border:0;background:none;color:#8b89a2;font:inherit;font-size:13px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+#kpiApp .creset:hover{color:#c32f2f}
+#kpiApp .ccopy{display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 24px;border:1.5px solid #d9d0f7;border-radius:14px;background:#fff;color:#5b3df5;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+#kpiApp .ccopy svg{width:20px;height:20px}
+#kpiApp .ccopy:hover{background:#f6f3ff;border-color:#bfb0f4;transform:translateY(-1px)}
+#kpiApp .cwa{flex:none;width:46px;height:46px;border:0;border-radius:50%;display:grid;place-items:center;background:#2fc759;color:#fff;cursor:pointer;box-shadow:0 12px 22px -8px rgba(47,199,89,.75);transition:transform .15s,box-shadow .15s}
+#kpiApp .cwa svg{width:25px;height:25px}
+#kpiApp .cwa:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 16px 26px -8px rgba(47,199,89,.8)}
+#kpiApp .ccopy:focus-visible,#kpiApp .cwa:focus-visible,#kpiApp .creset:focus-visible{outline:3px solid #9b7cf4;outline-offset:3px}
+@media(max-width:1000px){#kpiApp .cart{display:none}}
+@container (max-width:1060px){#kpiApp .cart{display:none}}
+@container (max-width:900px){#kpiApp .cf{padding:0 16px;gap:10px}#kpiApp .cf:first-child{padding-left:0}#kpiApp .cfi{width:40px;height:40px}}
+@media(max-width:760px){#kpiApp .coach{grid-template-columns:1fr;gap:40px;padding:34px 20px 24px;text-align:center}
+#kpiApp .cbody p.cdesc{margin:0 auto}
+#kpiApp .cfeat{flex-direction:column;align-items:flex-start;gap:16px;width:max-content;max-width:100%;margin:26px auto 0;text-align:left}
+#kpiApp .cf,#kpiApp .cf:first-child{padding:0}
+#kpiApp .cf+.cf::before{display:none}
+#kpiApp .cfoot{flex-wrap:wrap}
+#kpiApp .creset{order:3;width:100%;margin:0;text-align:center}
+#kpiApp .ccopy{flex:1;justify-content:center}}
+@container (max-width:720px){#kpiApp .coach{grid-template-columns:1fr;gap:40px;padding:34px 20px 24px;text-align:center}
+#kpiApp .cbody p.cdesc{margin:0 auto}
+#kpiApp .cfeat{flex-direction:column;align-items:flex-start;gap:16px;width:max-content;max-width:100%;margin:26px auto 0;text-align:left}
+#kpiApp .cf,#kpiApp .cf:first-child{padding:0}
+#kpiApp .cf+.cf::before{display:none}
+#kpiApp .cfoot{flex-wrap:wrap}
+#kpiApp .creset{order:3;width:100%;margin:0;text-align:center}
+#kpiApp .ccopy{flex:1;justify-content:center}}
+#kpiApp .fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+#kpiApp label{display:flex;flex-direction:column;gap:5px;font-size:12.5px;font-weight:600;color:#33475b}
+#kpiApp input,#kpiApp select{font:inherit;font-weight:500;padding:10px 12px;border:1px solid #cfd8e2;border-radius:10px;background:#fff;color:var(--ink);width:100%}
+#kpiApp input:focus,#kpiApp select:focus,#kpiApp button:focus-visible{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+#kpiApp .btn{font:inherit;font-weight:700;border:0;border-radius:12px;padding:11px 18px;cursor:pointer;background:var(--brand);color:#fff}
+#kpiApp .btn:hover{background:var(--brand2)}
+#kpiApp .btn:disabled{opacity:.4;cursor:not-allowed}
+#kpiApp .btn.ghost{background:#fff;color:var(--brand);border:1px solid #d8c8f7}
+#kpiApp .btn.ghost:hover{background:#f3edfd}
+#kpiApp .btn.danger{background:#fff;color:var(--r);border:1px solid #f0c4c4}
+#kpiApp .btn.danger:hover{background:var(--rb)}
+#kpiApp .btn.sm{padding:6px 12px;font-size:12.5px}
+#kpiApp .btn.wa{background:#1faa59;font-size:17px;padding:18px;width:100%;border-radius:16px}
+#kpiApp .btn.wa:hover{background:#188a48}
+#kpiApp .cc{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;background:#fbfcfd}
+#kpiApp .cch{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+#kpiApp .cch h3{margin:0;font-size:15px}
+#kpiApp .kpih{font-size:12.5px;color:var(--mut);margin:16px 0 8px}
+#kpiApp .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px}
+#kpiApp .kpi input{font-weight:700}
+#kpiApp .kpi.g input{background:var(--gb);border-color:#bfe5d2}
+#kpiApp .kpi.y input{background:var(--yb);border-color:#f1dc9a}
+#kpiApp .kpi.r input{background:var(--rb);border-color:#f3c3c3}
+#kpiApp .warn{color:var(--r);font-size:12.5px;font-weight:600;margin-top:10px}
+#kpiApp .warn:empty{display:none}
+#kpiApp .met{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}
+#kpiApp .chip{background:#fff;border:1px solid var(--line);border-left:4px solid var(--n);border-radius:10px;padding:5px 10px;font-size:12px;color:var(--mut)}
+#kpiApp .chip b{display:block;font-size:14.5px;color:var(--ink)}
+#kpiApp .chip.g{border-left-color:var(--g)}
+#kpiApp .chip.y{border-left-color:#e0a200}
+#kpiApp .chip.r{border-left-color:var(--r)}
+#kpiApp .badge,#kpiApp .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:800;white-space:nowrap}
+#kpiApp .g.badge,#kpiApp .g.pill{background:var(--gb);color:var(--g)}
+#kpiApp .y.badge,#kpiApp .y.pill{background:var(--yb);color:var(--y)}
+#kpiApp .r.badge,#kpiApp .r.pill{background:var(--rb);color:var(--r)}
+#kpiApp .n.badge,#kpiApp .n.pill{background:var(--nb);color:var(--n)}
+#kpiApp .o.pill{background:var(--ob);color:var(--o)}
+#kpiApp .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+#kpiApp .tile{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+#kpiApp .tile span{font-size:12px;color:var(--mut);font-weight:600}
+#kpiApp .tile b{display:block;font-size:22px;margin-top:2px;letter-spacing:-.01em}
+#kpiApp .tile.g{background:var(--gb);border-color:#bfe5d2}
+#kpiApp .tile.y{background:var(--yb);border-color:#f1dc9a}
+#kpiApp .tile.r{background:var(--rb);border-color:#f3c3c3}
+#kpiApp .trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:18px}
+#kpiApp .card3{border-radius:14px;padding:16px;border:1px solid var(--line)}
+#kpiApp .card3 small{font-weight:700;color:var(--mut)}
+#kpiApp .card3 h4{margin:4px 0;font-size:18px}
+#kpiApp .card3 p{margin:0;font-size:13px;color:var(--mut)}
+#kpiApp .card3.g{background:var(--gb)}
+#kpiApp .card3.y{background:var(--yb)}
+#kpiApp .card3.r{background:var(--rb)}
+#kpiApp .tw{overflow-x:auto}
+#kpiApp table{width:100%;border-collapse:collapse;min-width:720px;font-size:13.5px}
+#kpiApp th{text-align:left;font-size:12px;color:var(--mut);padding:10px;border-bottom:2px solid var(--line)}
+#kpiApp td{padding:11px 10px;border-bottom:1px solid var(--line)}
+#kpiApp .verdict{border-radius:16px;padding:20px;border:1px solid var(--line)}
+#kpiApp .verdict h3{margin:6px 0 6px;font-size:22px}
+#kpiApp .verdict p{margin:0;max-width:760px}
+#kpiApp .verdict.g{background:var(--gb)}
+#kpiApp .verdict.y{background:var(--yb)}
+#kpiApp .verdict.o{background:var(--ob)}
+#kpiApp .verdict.r{background:var(--rb)}
+#kpiApp ul.ins{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+#kpiApp ul.ins li{background:var(--bg);border-radius:12px;padding:12px 14px}
+#kpiApp .rep{white-space:pre-wrap;background:#fbfcfd;border:1px solid var(--line);border-radius:14px;padding:18px;font-size:13.5px;line-height:1.65;max-height:560px;overflow:auto}
+#kpiApp .seg{display:inline-flex;border:1px solid #d8c8f7;border-radius:10px;overflow:hidden}
+#kpiApp .seg button{border:0;background:#fff;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer;color:var(--brand)}
+#kpiApp .seg button.on{background:var(--brand);color:#fff}
+#kpiApp .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+#kpiApp .acts{display:grid;gap:12px;margin:8px 0 40px}
+#kpiApp .acts .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#kpiApp .empty{text-align:center;padding:40px 20px;color:var(--mut);border:2px dashed #cfd8e2;border-radius:18px;margin-bottom:20px}
+#kpiApp .empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+#kpiApp #kpiToast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+#kpiApp #kpiToast.on{opacity:1;transform:translateX(-50%)}
+@media(max-width:600px){#kpiApp .panel{padding:16px}
+#kpiApp .acts .two{grid-template-columns:1fr}}
+@container (max-width:560px){#kpiApp .panel{padding:16px}
+#kpiApp .acts .two{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){#kpiApp *{transition:none!important}}
+
+/* ---- platform integration (page head, layout) ---- */
+#kpiApp{direction:ltr;text-align:left;margin-top:40px;scroll-margin-top:24px}
+#kpiApp .wrap{max-width:1120px;padding:0;container-type:inline-size}
+#kpiApp .kpi-head{
+  padding:38px 46px;margin-bottom:26px;text-align:center;
+  border-radius:var(--radius-xl,28px);box-shadow:var(--shadow-sm,0 2px 10px rgba(76,29,149,.06));
+  background:
+    radial-gradient(500px 320px at 15% 20%, rgba(255,255,255,.55), transparent 55%),
+    radial-gradient(420px 300px at 85% 80%, rgba(124,58,237,.28), transparent 60%),
+    linear-gradient(120deg,#efe7fb 0%,#ddcdf7 45%,#cabaf2 100%);
+}
+#kpiApp .kpi-title{font-size:28px;line-height:1.35;font-weight:800;color:var(--purple-900,#2b1550);margin-bottom:12px}
+#kpiApp .kpi-lead{font-size:14.5px;line-height:1.85;font-weight:500;color:#5b4d7d;max-width:62ch;margin:0 auto}
+#kpiApp .kpi-status{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;margin-top:22px}
+#kpiApp .panel{margin-bottom:20px}
+@media(max-width:860px){#kpiApp{margin-top:24px}#kpiApp .kpi-head{padding:28px 20px}#kpiApp .kpi-title{font-size:22px}}
+
+/* ===== Country flags dropdown ===== */
+/* ===== Country flags ===== */
+.cf-flag{display:inline-block;width:22px;height:15px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.16);flex:none;vertical-align:middle}
+.cf-chev{width:11px;height:11px;flex:none;fill:none;stroke:#7a7a9d;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s ease}
+.cf-btn[aria-expanded="true"] .cf-chev{transform:rotate(180deg)}
+.cf-btn .cf-txt{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-btn.cf-ph .cf-txt{opacity:.7}
+#kpiApp .cf-btn{display:flex;align-items:center;gap:10px;width:100%;font:inherit;font-weight:500;padding:10px 12px;border:1px solid #cfd8e2;border-radius:10px;background:#fff;color:var(--ink);cursor:pointer;text-align:left;direction:ltr}
+#kpiApp .cf-btn .cf-txt{flex:1}
+html[data-theme="dark"] #kpiApp .cf-btn{background:#120c26;border-color:#3a2d66}
+#kpiApp .cf-btn:focus-visible,#kpiApp .cf-btn[aria-expanded="true"]{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+.cf-pop{position:fixed;z-index:100000;box-sizing:border-box;background:#fff;border:1px solid #e3dcf5;border-radius:14px;box-shadow:0 18px 40px -12px rgba(40,20,90,.38);padding:6px;max-height:min(330px,60vh);overflow:auto;font:600 13px/1.2 "Plus Jakarta Sans",Inter,system-ui,sans-serif;color:#271447;direction:ltr;text-align:left}
+.cf-pop.cf-dark{background:#1a1230;border-color:#33275a;color:#ece6fb;box-shadow:0 18px 40px -12px rgba(0,0,0,.75)}
+.cf-opt{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;cursor:pointer}
+.cf-opt:hover,.cf-opt.cf-act{background:#f1eafd}
+.cf-dark .cf-opt:hover,.cf-dark .cf-opt.cf-act{background:#2a1f52}
+.cf-opt[aria-selected="true"]{color:#632cd8;font-weight:800}
+.cf-dark .cf-opt[aria-selected="true"]{color:#b79cff}
+.cf-opt .cf-ok{margin-left:auto;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.cf-opt.cf-none{color:#7a7a9d;font-weight:500}
+
+/* ===== Dark theme ===== */
+html[data-theme="dark"]{color-scheme:dark;background:#0f0a1f}
+html[data-theme="dark"] #dashboardScreen{--ink:#ece6fb;--muted:#a99ecb;--muted-2:#9a8fbf;--gray-400:#8a7fb0;--gray-bg:#231a3f;--green:#3ddc97;--green-bg:rgba(61,220,151,.14);--white:#1a1230;--purple-50:#221a3d;--purple-100:#2c2250;--purple-200:#3b2d68;--purple-300:#5a45a0;--shadow-sm:0 2px 10px rgba(0,0,0,.38);--shadow-md:0 12px 32px rgba(0,0,0,.55);background:#0f0a1f;color:var(--ink)}
+html[data-theme="dark"] #dashboardScreen .main-area{background:radial-gradient(700px 420px at 85% -10%,rgba(124,58,237,.22),transparent 60%),linear-gradient(180deg,#140d2b 0%,#0f0a1f 35%,#0d0919 100%)}
+html[data-theme="dark"] #dashboardScreen .icon-btn{color:#c3b6e6}
+html[data-theme="dark"] #dashboardScreen .icon-btn .dot{border-color:#1a1230}
+html[data-theme="dark"] #kpiApp{--ink:#ece6fb;--mut:#a99ecb;--line:#33275a;--bg:#150f2b;--brand:#8b5cf6;--brand2:#7c4dff;--g:#4ade9b;--gb:rgba(34,197,130,.14);--y:#f5c451;--yb:rgba(245,196,81,.14);--r:#ff8080;--rb:rgba(255,100,100,.14);--o:#ffa66b;--ob:rgba(255,166,107,.14);--n:#a99ecb;--nb:#241a42}
+html[data-theme="dark"] #kpiApp .panel{--pt:#2a1d52;--pd:#cdb8ff;background:linear-gradient(180deg,var(--pt) 0,rgba(26,18,48,.96) 170px);border-color:var(--line);box-shadow:none}
+html[data-theme="dark"] #kpiApp .c2{--pt:#17264d;--pd:#9db8ff}
+html[data-theme="dark"] #kpiApp .c3{--pt:#12312f;--pd:#6fe0cf}
+html[data-theme="dark"] #kpiApp .c4{--pt:#3a2a12;--pd:#ffc069}
+html[data-theme="dark"] #kpiApp .c5{--pt:#3b1830;--pd:#ff9cc7}
+html[data-theme="dark"] #kpiApp .c6{--pt:#103040;--pd:#6fd6ee}
+html[data-theme="dark"] #kpiApp .c7{--pt:#232c3b;--pd:#b7c4d6}
+html[data-theme="dark"] #kpiApp .cc{--ca:#a78bfa;background:#1a1230;border-color:var(--line)}
+html[data-theme="dark"] #kpiApp .cc.a1{--ca:#7aa2ff}
+html[data-theme="dark"] #kpiApp .cc.a2{--ca:#4fd1c0}
+html[data-theme="dark"] #kpiApp .cc.a3{--ca:#f5a54a}
+html[data-theme="dark"] #kpiApp label{color:#c9bfe6}
+html[data-theme="dark"] #kpiApp input,html[data-theme="dark"] #kpiApp select{background:#120c26;border-color:#3a2d66;color:var(--ink)}
+html[data-theme="dark"] #kpiApp .kpi.g input{background:var(--gb);border-color:rgba(74,222,155,.35)}
+html[data-theme="dark"] #kpiApp .kpi.y input{background:var(--yb);border-color:rgba(245,196,81,.35)}
+html[data-theme="dark"] #kpiApp .kpi.r input{background:var(--rb);border-color:rgba(255,128,128,.35)}
+html[data-theme="dark"] #kpiApp .btn.ghost{background:#1a1230;border-color:#3a2d66;color:#c9b3ff}
+html[data-theme="dark"] #kpiApp .btn.ghost:hover{background:#241a42}
+html[data-theme="dark"] #kpiApp .btn.danger{background:#1a1230;border-color:rgba(255,128,128,.4);color:var(--r)}
+html[data-theme="dark"] #kpiApp .chip,html[data-theme="dark"] #kpiApp .tile,html[data-theme="dark"] #kpiApp ul.ins li{background:#1a1230}
+html[data-theme="dark"] #kpiApp .tile.g{background:var(--gb);border-color:rgba(74,222,155,.35)}
+html[data-theme="dark"] #kpiApp .tile.y{background:var(--yb);border-color:rgba(245,196,81,.35)}
+html[data-theme="dark"] #kpiApp .tile.r{background:var(--rb);border-color:rgba(255,128,128,.35)}
+html[data-theme="dark"] #kpiApp .rep{background:#120c26}
+html[data-theme="dark"] #kpiApp .seg{border-color:#3a2d66}
+html[data-theme="dark"] #kpiApp .seg button{background:#1a1230;color:#c9b3ff}
+html[data-theme="dark"] #kpiApp .seg button.on{background:var(--brand);color:#fff}
+html[data-theme="dark"] #kpiApp .empty{border-color:#3a2d66}
+html[data-theme="dark"] #kpiApp #kpiToast{background:#2c2250}
+html[data-theme="dark"] #kpiApp .kpi-head{background:radial-gradient(500px 320px at 15% 20%,rgba(167,139,250,.18),transparent 55%),radial-gradient(420px 300px at 85% 80%,rgba(124,58,237,.35),transparent 60%),linear-gradient(120deg,#1f1247 0%,#2c1964 50%,#3a2180 100%)}
+html[data-theme="dark"] #kpiApp .kpi-title{color:#f5f0ff}
+html[data-theme="dark"] #kpiApp .kpi-lead{color:#cdc3ec}
+html[data-theme="dark"] #kpiApp .coach{background:radial-gradient(55% 80% at 100% 0%,rgba(124,58,237,.22) 0,transparent 70%),linear-gradient(180deg,#1a1230,#150e29);border-color:#2f2450}
+html[data-theme="dark"] #kpiApp .cph::before{background:linear-gradient(155deg,#3a2a70 0,#2a1f55 55%,#221a45 100%)}
+html[data-theme="dark"] #kpiApp .cring{background:#1a1230;box-shadow:0 22px 38px -16px rgba(0,0,0,.6)}
+html[data-theme="dark"] #kpiApp .cbadge{background:#241a42;color:#f1ecff}
+html[data-theme="dark"] #kpiApp .cbody .ceyebrow{color:#b79cff}
+html[data-theme="dark"] #kpiApp .cbody h2{color:#f5f0ff}
+html[data-theme="dark"] #kpiApp .cbody p.cdesc{color:#b3a9d6}
+html[data-theme="dark"] #kpiApp .cf b{color:#f1ecff}
+html[data-theme="dark"] #kpiApp .cf small{color:#a99ecb}
+html[data-theme="dark"] #kpiApp .cf+.cf::before{background:#33275a}
+html[data-theme="dark"] #kpiApp .cfi{background:#2a1f52;color:#b79cff}
+html[data-theme="dark"] #kpiApp .cfoot{border-top-color:#2f2450}
+html[data-theme="dark"] #kpiApp .creset{color:#a99ecb}
+html[data-theme="dark"] #kpiApp .ccopy{background:#1a1230;border-color:#3a2d66;color:#c9b3ff}
+html[data-theme="dark"] #kpiApp .ccopy:hover{background:#241a42;border-color:#5a45a0}
+#dashboardScreen .theme-toggle:focus-visible{outline:3px solid rgba(124,58,237,.45);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){html.theme-anim,html.theme-anim *{transition:background-color .25s ease,border-color .25s ease,color .2s ease!important}}
+</style>
+</head>
+<body>
+<div id="dashboardScreen">
+<div class="app-shell">
+  <div class="main-area">
+    <header class="topbar">
+      <span class="spacer"></span>
+      <div class="header-actions">
+        <button type="button" class="icon-btn theme-toggle" id="themeBtn" aria-label="تفعيل الوضع الداكن" aria-pressed="false">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+        </button>
+      </div>
+    </header>
+    <div class="content">
+      <section id="kpiApp" aria-labelledby="kpiTitle">
+        <div class="kpi-head">
+          <h2 class="kpi-title" id="kpiTitle">📊 Turn your Meta Ads numbers into a clear decision</h2>
+          <p class="kpi-lead">Enter your campaign data and the results of each creative. The tool calculates your KPIs, tells you which creative is worth scaling, and prepares a report for your coach.</p>
+          <div class="kpi-status"><span id="pill" class="pill n">Waiting for data</span><button class="btn ghost" id="ex" type="button">Load Example Data</button></div>
+        </div>
+        <div class="wrap">
+
+<section class="panel c1"><h2>📋 CAMPAIGN INFORMATION</h2><p class="hint">Fill what you know. Only the creative numbers are needed for the analysis.</p>
+<div class="fg" id="info">
+  <label>Seller Name<input id="seller" placeholder="e.g. Ahmed Ali"></label>
+  <label>Product Name<input id="product" placeholder="e.g. Posture Corrector"></label>
+  <label>Country<select id="country"><option>Saudi Arabia 🇸🇦</option><option>UAE 🇦🇪</option><option>Kuwait 🇰🇼</option><option>Qatar 🇶🇦</option><option>Oman 🇴🇲</option><option>Bahrain 🇧🇭</option><option>Iraq 🇮🇶</option></select></label>
+  <label>Campaign Name<input id="camp" placeholder="e.g. META ADS TEST"></label>
+  
+  <label>Start Date<input id="sd" type="date"></label>
+  <label>End Date<input id="ed" type="date"></label>
+  <label title="Daily budget of each ad set, in US dollars">Daily Budget per Ad Set ($)<input id="bud" type="number" min="0" step="any" placeholder="e.g. 5"></label>
+  <label title="Each ad set has one video. Changing this adds or removes the ad set cards below">Number of Ad Sets<input id="cnt" type="number" min="1" max="12" value="1"></label>
+</div></section>
+
+<section class="panel c2"><h2>🎬 CREATIVE PERFORMANCE</h2><p class="hint">One card per ad set (each ad set has one video). Copy the numbers from Meta Ads Manager. Results update as you type.</p>
+<div id="cards"></div><button class="btn" id="add">+ Add Ad Set</button></section>
+
+<div class="empty" id="empty"><b>Your analysis will appear here</b>Enter spend, impressions and clicks for a creative, or load the example data to see how it works.</div>
+
+<div id="results" hidden>
+<section class="panel c3"><h2>📊 GLOBAL PERFORMANCE</h2><p class="hint">Totals across all creatives. Percentages are calculated from totals, not averaged.</p><div class="tiles" id="tiles"></div></section>
+
+<section class="panel c4"><h2>🏆 CREATIVE ANALYSIS</h2><p class="hint">Creatives are ranked by purchases first, then CPA, then conversion rate. CTR alone never decides.</p>
+<div class="trio" id="trio"></div>
+<div class="tw"><table><thead><tr><th>Video / Ad Set</th><th>Spend</th><th>CTR</th><th>CPC</th><th>Hook Rate</th><th>LPV</th><th>Purchases</th><th>CPA</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div></section>
+
+<section class="panel c5"><h2>🎯 COACH RECOMMENDATION</h2><div class="verdict" id="rec"></div></section>
+<section class="panel c6"><h2>🧠 KEY INSIGHTS</h2><ul class="ins" id="ins"></ul></section>
+
+<section class="panel c7"><div class="row"><h2 style="margin:0">📊 META ADS PERFORMANCE REPORT</h2>
+<div class="seg"><button data-l="fr">Français</button><button data-l="en" class="on">English</button></div></div>
+<div class="rep" id="rep"></div></section>
+</div>
+
+</div>
+        <div id="kpiToast" role="status"></div>
+      </section>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* KPI ANALYZER (wrapped in its own function: no globals leak into the platform) */
+(function(){
+/* ===== CONFIGURATION: edit thresholds here ===== */
+const CFG={
+  MIN_SPEND_FOR_ANALYSIS:3,   // below this spend ($): "insufficient data"
+  WEAK_SPEND_THRESHOLD:7,     // spend ($) with 0 purchases = weak conversion signal
+  GOOD_CPA:5, HIGH_CPA:8,     // $ per purchase
+  GOOD_CTR:1.0, LOW_CTR:0.7,  // %
+  GOOD_HOOK_RATE:20, LOW_HOOK_RATE:12, // %
+  GOOD_CVR:5, LOW_CVR:2,      // LPV -> purchase %
+  GOOD_CPC:0.5,               // $
+  MAX_CREATIVES:12,
+  DEFAULT_CREATIVES:1         // ad set cards shown at start and after "Reset analysis"
+};
+
+/* ===== Helpers ===== */
+const root=document.getElementById('kpiApp');
+const $=(s,r=root)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let creatives=[],uid=0,reportLang='en',L='en';
+const x=(en,fr)=>L==='fr'?fr:en;
+const withLang=(l,fn)=>{const o=L;L=l;try{return fn()}finally{L=o}};
+const num=v=>{if(v===''||v==null)return null;const n=parseFloat(v);return isFinite(n)&&n>=0?n:null};
+const fm=v=>v==null?'N/A':'$'+v.toFixed(2), fp=v=>v==null?'N/A':v.toFixed(2)+'%', fi=v=>Math.round(v).toLocaleString('en-US');
+const fd=d=>d?d.split('-').reverse().join('/'):'—';
+const tone=(v,good,bad,inv)=>v==null?'n':(inv?(v<=good?'g':v<=bad?'y':'r'):(v>=good?'g':v>=bad?'y':'r'));
+const tCtr=v=>tone(v,CFG.GOOD_CTR,CFG.LOW_CTR),tCpa=v=>tone(v,CFG.GOOD_CPA,CFG.HIGH_CPA,1),tHook=v=>tone(v,CFG.GOOD_HOOK_RATE,CFG.LOW_HOOK_RATE),
+      tCvr=v=>tone(v,CFG.GOOD_CVR,CFG.LOW_CVR),tCpc=v=>tone(v,CFG.GOOD_CPC,CFG.GOOD_CPC*1.6,1);
+
+/* ===== Texts ===== */
+const V={
+strong:{c:'g',e:'🟢',l:['STRONG PERFORMER','PERFORMANCE FORTE'],t:[`Excellent purchase efficiency. This creative generates conversions at a competitive CPA and should be considered for progressive scaling.`,`Excellente efficacité d'achat. Ce créatif génère des conversions à un CPA compétitif et peut être envisagé pour un scaling progressif.`]},
+convwin:{c:'g',e:'🟢',l:['CONVERSION WINNER','GAGNANT EN CONVERSION'],t:[`CTR is not the strongest, but the creative converts efficiently. Do not judge it by CTR alone: its purchase performance makes it one of the strongest creatives.`,`Le CTR n'est pas le plus élevé, mais le créatif convertit efficacement. Ne le jugez pas uniquement sur le CTR : ses achats en font l'un des meilleurs créatifs.`]},
+traffic:{c:'y',e:'🟡',l:['TRAFFIC GENERATOR','GÉNÉRATEUR DE TRAFIC'],t:[`This creative generates good traffic and strong click performance, but purchase efficiency is weaker than the best creatives. Check the landing page, offer, product-market fit and pricing before scaling.`,`Ce créatif génère un bon trafic et de bons clics, mais l'efficacité d'achat est inférieure aux meilleurs créatifs. Vérifiez la landing page, l'offre, l'adéquation produit-marché et le prix avant de scaler.`]},
+attention:{c:'y',e:'🟡',l:['NEEDS ATTENTION','À SURVEILLER'],t:[`Mixed results: purchases exist but CPA or conversion is not yet competitive. Monitor it and compare with your best creative.`,`Résultats mitigés : des achats existent mais le CPA ou la conversion n'est pas encore compétitif. Surveillez et comparez avec votre meilleur créatif.`]},
+monitor:{c:'y',e:'🟡',l:['NEEDS MORE DATA','BESOIN DE PLUS DE DONNÉES'],t:[`No purchase yet, but spend is still low. Keep it running and monitor before deciding.`,`Pas encore d'achat, mais la dépense reste faible. Laissez tourner et surveillez avant de décider.`]},
+weak:{c:'r',e:'🔴',l:['WEAK CONVERSION','CONVERSION FAIBLE'],t:[`The creative generates traffic but has not generated purchases. Avoid increasing budget for this creative until the creative, offer or landing page is improved.`,`Le créatif génère du trafic mais aucun achat. Évitez d'augmenter son budget avant d'améliorer le créatif, l'offre ou la landing page.`]},
+insufficient:{c:'n',e:'⚪',l:['INSUFFICIENT DATA','DONNÉES INSUFFISANTES'],t:[`Not enough spend to judge this creative yet. Let it gather more data.`,`Dépense insuffisante pour juger ce créatif. Laissez-le collecter plus de données.`]}};
+const REC={
+scale:{c:'g',e:'🟢',l:['CONTINUE & SCALE','CONTINUER & SCALER'],t:[`Purchases and CPA are solid and at least one creative is a clear winner. Scale progressively (about +20% budget every 48h) on the strongest creatives.`,`Les achats et le CPA sont solides et au moins un créatif est gagnant. Scalez progressivement (environ +20% de budget toutes les 48h) sur les meilleurs créatifs.`]},
+testing:{c:'y',e:'🟡',l:['CONTINUE TESTING','CONTINUER LE TEST'],t:[`Signals are promising or data is still limited. Keep testing so each creative gathers more purchases before any scaling decision.`,`Les signaux sont prometteurs ou les données encore limitées. Continuez le test pour que chaque créatif accumule plus d'achats avant de scaler.`]},
+optimize:{c:'o',e:'🟠',l:['OPTIMIZE BEFORE SCALING','OPTIMISER AVANT DE SCALER'],t:[`Traffic is coming in but purchase efficiency is too weak. Improve the landing page, offer or pricing before spending more.`,`Le trafic arrive mais l'efficacité d'achat est trop faible. Améliorez la landing page, l'offre ou le prix avant de dépenser plus.`]},
+review:{c:'r',e:'🔴',l:['REVIEW / RESTART TEST','REVOIR / RELANCER LE TEST'],t:[`Meaningful spend with no purchases. Review the product, offer, creatives and targeting, then restart the test with improvements.`,`Dépense significative sans achat. Revoyez le produit, l'offre, les créatifs et le ciblage, puis relancez le test avec des améliorations.`]}};
+const vl=(o,i)=>o.l[L==='fr'?1:0], vt=o=>o.t[L==='fr'?1:0];
+
+/* ===== Calculations ===== */
+function calc(c,noOv){
+  const s=num(c.spend),i=num(c.impr),k=num(c.clicks),l=num(c.lpv),p=num(c.purch);
+  const d=(a,b,m=1)=>a!=null&&b!=null&&b>0?a/b*m:null;
+  const ov=(f,v)=>(!noOv&&num(c[f])!=null)?num(c[f]):v; /* seller-typed KPI wins over auto-calculation */
+  return{s:s||0,r:num(c.reach)||0,i:i||0,k:k||0,l:l||0,p:p||0,ctr:ov('kctr',d(k,i,100)),cpc:ov('kcpc',d(s,k)),cpm:ov('kcpm',d(s,i,1000)),lpvr:d(l,k,100),
+    cvr:d(p||0,l,100),cpa:ov('kcpa',(p>0&&s!=null)?s/p:null),hook:ov('khook',null)};
+}
+function verdict(k){
+  if(k.s<CFG.MIN_SPEND_FOR_ANALYSIS)return'insufficient';
+  if(k.p===0)return(k.s>=CFG.WEAK_SPEND_THRESHOLD&&k.k>0)?'weak':'monitor';
+  if(k.cpa<=CFG.GOOD_CPA&&(k.cvr==null||k.cvr>=CFG.LOW_CVR))return(k.ctr!=null&&k.ctr<CFG.GOOD_CTR)?'convwin':'strong';
+  if(k.ctr!=null&&k.ctr>=CFG.GOOD_CTR)return'traffic';
+  return'attention';
+}
+const cmp=(a,b)=>(b.k.p-a.k.p)||((a.k.cpa??Infinity)-(b.k.cpa??Infinity))||((b.k.cvr||0)-(a.k.cvr||0))||((b.k.ctr||0)-(a.k.ctr||0));
+function totals(list){
+  const T={s:0,r:0,i:0,k:0,l:0,p:0,h:0,hi:0};
+  list.forEach(o=>{T.s+=o.k.s;T.r+=o.k.r;T.i+=o.k.i;T.k+=o.k.k;T.l+=o.k.l;T.p+=o.k.p;
+    if(o.k.hook!=null&&o.k.i>0){T.h+=o.k.hook*o.k.i/100;T.hi+=o.k.i}});
+  const d=(a,b,m=1)=>b>0?a/b*m:null;
+  return{...T,ctr:d(T.k,T.i,100),cpc:d(T.s,T.k),cpm:d(T.s,T.i,1000),lpvr:d(T.l,T.k,100),cvr:d(T.p,T.l,100),cpa:T.p>0?T.s/T.p:null,hook:d(T.h,T.hi,100)};
+}
+function recommend(G,list){
+  const n=Math.max(1,list.length),win=list.filter(o=>o.v==='strong'||o.v==='convwin').length;
+  if(G.s<CFG.MIN_SPEND_FOR_ANALYSIS*n)return'testing';
+  if(G.p===0)return G.s>=CFG.WEAK_SPEND_THRESHOLD*n?'review':'testing';
+  if(G.cpa>CFG.HIGH_CPA||(G.l>=30&&G.cvr<CFG.LOW_CVR))return'optimize';
+  if(G.cpa<=CFG.GOOD_CPA&&G.p>=3&&win>0)return'scale';
+  return'testing';
+}
+function analyse(){
+  const list=creatives.map((c,i)=>{const k=calc(c);return{c,i,k,v:verdict(k),name:c.name.trim()||null}});
+  const act=list.filter(o=>o.k.s>0||o.k.i>0);
+  const G=totals(list),ranked=[...act].sort(cmp);
+  const best=ranked[0]&&ranked[0].k.p>0?ranked[0]:null;
+  const last=ranked[ranked.length-1];
+  const weak=(act.length>1&&last!==best&&last.k.s>=CFG.MIN_SPEND_FOR_ANALYSIS&&(last.v==='weak'||last.v==='attention'||last.v==='traffic'||last.v==='monitor'))?last:null;
+  const watch=act.filter(o=>o!==best&&o!==weak&&['traffic','attention','monitor'].includes(o.v)).sort((a,b)=>b.k.s-a.k.s)[0]||null;
+  return{list,act,G,best,weak,watch,rec:recommend(G,act)};
+}
+const nm=o=>o.name||(x('VIDEO ','VIDÉO ')+(o.i+1));
+function insights(A){
+  const{act,G,best,weak}=A,out=[];
+  if(best)out.push(x(`${nm(best)} is currently the strongest conversion creative (${best.k.p} purchase${best.k.p>1?'s':''}, CPA ${fm(best.k.cpa)}).`,`${nm(best)} est actuellement le créatif le plus fort en conversion (${best.k.p} achat${best.k.p>1?'s':''}, CPA ${fm(best.k.cpa)}).`));
+  const top=[...act].filter(o=>o.k.s>=CFG.MIN_SPEND_FOR_ANALYSIS&&o.k.ctr!=null).sort((a,b)=>b.k.ctr-a.k.ctr)[0];
+  if(top&&top!==best&&best&&(top.k.p<best.k.p||(top.k.cpa||Infinity)>best.k.cpa))out.push(x(`${nm(top)} has the highest CTR (${fp(top.k.ctr)}) but weaker purchase efficiency.`,`${nm(top)} a le CTR le plus élevé (${fp(top.k.ctr)}) mais une efficacité d'achat plus faible.`));
+  act.filter(o=>o.v==='weak').slice(0,2).forEach(o=>out.push(x(`${nm(o)} generates traffic but has not generated purchases.`,`${nm(o)} génère du trafic mais n'a pas généré d'achats.`)));
+  if(G.l>=30&&G.cvr!=null&&G.cvr<CFG.LOW_CVR)out.push(x(`Review the landing page: LPV volume is good but conversion is weak (${fp(G.cvr)}).`,`La landing page doit être revue : le volume de LPV est bon mais la conversion est faible (${fp(G.cvr)}).`));
+  else if(G.lpvr!=null&&G.k>=30&&G.lpvr<70)out.push(x(`Only ${fp(G.lpvr)} of clicks become landing page views. Check page speed and the link.`,`Seulement ${fp(G.lpvr)} des clics deviennent des visites de landing page. Vérifiez la vitesse de la page et le lien.`));
+  out.push(G.p>=5?x(`The campaign has enough purchase data (${G.p}) to begin identifying winning creatives.`,`La campagne a assez d'achats (${G.p}) pour commencer à identifier les créatifs gagnants.`)
+    :x(`Data is still limited (${G.p} purchase${G.p===1?'':'s'}). Keep testing before making big decisions.`,`Les données restent limitées (${G.p} achat${G.p===1?'':'s'}). Continuez à tester avant les grandes décisions.`));
+  if(G.hook!=null)out.push(G.hook>=CFG.GOOD_HOOK_RATE?x(`Hook Rate is strong (${fp(G.hook)}): your openings capture attention.`,`Le Hook Rate est fort (${fp(G.hook)}) : vos débuts de vidéo captent l'attention.`)
+    :G.hook<CFG.LOW_HOOK_RATE?x(`Hook Rate is low (${fp(G.hook)}): test stronger first 3 seconds.`,`Le Hook Rate est faible (${fp(G.hook)}) : testez des 3 premières secondes plus fortes.`):'');
+  out.push(x(`Do not scale based on CTR alone: purchases and CPA come first.`,`Ne scalez pas sur le seul CTR : les achats et le CPA passent en premier.`));
+  return out.filter(Boolean).slice(0,5);
+}
+
+/* ===== Report ===== */
+function info(){const g=id=>$('#'+id).value.trim();return{seller:g('seller'),product:g('product'),country:g('country'),camp:g('camp'),sd:g('sd'),ed:g('ed'),bud:g('bud')}}
+function buildReport(l){return withLang(l,()=>{
+  const I=info(),A=analyse(),G=A.G,o=[];
+  const p=s=>o.push(s);
+  p(`📊 *${x('META ADS PERFORMANCE REPORT','RAPPORT DE PERFORMANCE META ADS')}*`);
+  if(I.seller)p(`👤 ${x('Seller','Vendeur')}: ${I.seller}`);
+  if(I.product)p(`📦 ${x('Product','Produit')}: ${I.product}`);
+  p(`🌍 ${x('Country','Pays')}: ${I.country}`);
+  if(I.camp)p(`📣 ${x('Campaign','Campagne')}: ${I.camp}`);
+  p(`📅 ${x('Period','Période')}: ${fd(I.sd)} – ${fd(I.ed)}`);
+  if(I.bud)p(`💰 Budget: $${I.bud}${x('/day per Ad Set','/jour par Ad Set')} ($${+(parseFloat(I.bud)*A.act.length).toFixed(2)}${x('/day total','/jour au total')})`);
+  p(`🎬 ${x(`Number of ad sets (1 video each)`,`Nombre d'ad sets (1 vidéo chacun)`)}: ${A.act.length}`);
+  p('');p(`*1. ${x('GLOBAL RESULTS','RÉSULTATS GLOBAUX')}*`);
+  p(`${x('Total spend','Dépenses totales')}: ${fm(G.s)}`);if(G.r>0)p(`Reach: ${fi(G.r)}`);p(`Impressions: ${fi(G.i)}`);
+  p(`${x('Link clicks','Clics sur le lien')}: ${fi(G.k)}`);p(`${x('Landing Page visits','Visites Landing Page')}: ${fi(G.l)}`);
+  p(`${x('Purchases','Achats')}: ${fi(G.p)}`);p(`${x('Average CPA','CPA moyen')}: ${fm(G.cpa)}`);
+  p(`${x('Weighted average CTR','CTR moyen pondéré')}: ${fp(G.ctr)}`);p(`${x('Average CPC','CPC moyen')}: ${fm(G.cpc)}`);
+  p(`${x('LPV → Purchase conversion','Taux de conversion LPV → Achat')}: ${fp(G.cvr)}`);
+  p('');p(`*2. ${x('PERFORMANCE BY VIDEO','PERFORMANCE PAR VIDÉO')}*`);
+  A.act.forEach(a=>{const v=V[a.v],k=a.k;p('');
+    p(`${v.e} *${nm(a).toUpperCase()}* – ${vl(v)}`);
+    if(a.c.adset.trim())p(`🎯 Ad Set: ${a.c.adset.trim()}`);
+    p(`${x('Spend','Dépenses')}: ${fm(k.s)} | Impressions: ${fi(k.i)}${k.r>0?` | Reach: ${fi(k.r)}`:''}`);
+    p(`${x('Clicks','Clics')}: ${fi(k.k)} | CTR: ${fp(k.ctr)} | CPC: ${fm(k.cpc)}`);
+    p(`Hook Rate: ${fp(k.hook)}${num(a.c.hold)!=null?` | Hold Rate: ${num(a.c.hold).toFixed(2)}%`:''}`);
+    p(`Landing Page Views: ${fi(k.l)} | LPV → ${x('Purchase','Achat')}: ${fp(k.cvr)}`);
+    p(`${x('Purchases','Achats')}: ${fi(k.p)} | CPA: ${fm(k.cpa)}`);
+    p(`${x('Analysis','Analyse')}: ${vt(v)}`);});
+  p('');p(`*3. ${x('BEST & WEAKEST','MEILLEUR & PLUS FAIBLE')}*`);
+  p(`🏆 ${x('Best creative','Meilleur créatif')}: ${A.best?nm(A.best):'N/A'}`);
+  if(A.watch)p(`⚠️ ${x('Creative to watch','Créatif à surveiller')}: ${nm(A.watch)}`);
+  p(`🔴 ${x('Weakest creative','Créatif le plus faible')}: ${A.weak?nm(A.weak):'N/A'}`);
+  const R=REC[A.rec];p('');p(`*4. ${x('COACH RECOMMENDATION','RECOMMANDATION COACH')}*`);
+  p(`${R.e} *${vl(R)}*`);p(vt(R));
+  p('');p(`*5. ${x('KEY INSIGHTS','INSIGHTS CLÉS')}*`);insights(A).forEach(s=>p(`• ${s}`));
+  return o.join('\n');
+})}
+
+/* ===== Rendering ===== */
+function newC(v){return{id:++uid,name:'',adset:'',kctr:'',kcpc:'',kcpm:'',kcpa:'',khook:'',spend:'',reach:'',impr:'',clicks:'',lpv:'',purch:'',hold:'',...v}}
+function cardHTML(c,i){
+  const f=(k,lab,ph,tip,type='number')=>`<label title="${tip}">${lab}<input data-f="${k}" type="${type}" ${type==='number'?'min="0" step="any" inputmode="decimal"':''} placeholder="${ph}" value="${esc(c[k])}"></label>`;
+  const kp=(k,lab,tip)=>`<label class="kpi" title="${tip}">${lab}<input data-f="${k}" type="number" min="0" step="any" inputmode="decimal" placeholder="auto" value="${esc(c[k])}"></label>`;
+  return `<article class="cc a${i%4}" data-id="${c.id}"><div class="cch"><h3>🎬 AD SET ${i+1}</h3><button class="btn sm danger" data-rm ${creatives.length<2?'disabled':''}>Remove Ad Set</button></div>
+  <div class="kpih" style="margin-top:0">Fields follow the column order of Meta Ads Manager. CPM, CPC, CTR and CPA can be left empty: they are calculated automatically.</div>
+  <div class="fg">${f('adset','Ad Set Name','e.g. KSA Broad','Name of this ad set in Meta Ads Manager','text')}${f('name','Video Name','VIDEO '+(i+1),'A name to recognize the video in this ad set','text')}${f('spend','Amount Spent ($)','e.g. 7.91','Amount spent on this ad set in USD')}${f('reach','Reach','e.g. 1500','People who saw the ad at least once')}
+  ${f('impr','Impressions','e.g. 2065','Times the ad was shown')}${kp('kcpm','CPM ($)','Cost per 1,000 impressions')}${f('clicks','Link Clicks','e.g. 17','Clicks on the ad link (not all clicks)')}${kp('kcpc','CPC (Link) ($)','Cost per link click')}
+  ${kp('kctr','CTR (Link) (%)','Link click-through rate')}${f('lpv','Landing Page Views','e.g. 15','People whose page fully loaded after the click')}${f('purch','Purchases','e.g. 2','Orders generated')}${kp('kcpa','CPA ($)','Cost per purchase')}
+  ${kp('khook','Hook Rate (%)','3-second views / impressions. Type it from Meta.')}${f('hold','Hold Rate (%) optional','e.g. 8','Optional: shown in the report only')}</div><div class="warn" data-w></div><div class="met" data-m></div></article>`;
+}
+function renderCards(){$('#cards').innerHTML=creatives.map(cardHTML).join('')}
+function warns(c){
+  const w=[],n=k=>num(c[k]);
+  ['spend','reach','impr','clicks','lpv','purch','hold','kctr','kcpc','kcpm','kcpa','khook'].forEach(k=>{if(c[k]!==''&&n(k)==null)w.push(`${k.replace(/^k/,'')}: enter a number of 0 or more.`)});
+  if(n('clicks')>n('impr'))w.push('Link clicks cannot be greater than impressions.');
+  if(n('lpv')>n('clicks'))w.push('Landing page views cannot be greater than link clicks.');
+  if(n('purch')>n('lpv'))w.push('Purchases cannot be greater than landing page views.');
+  if(n('reach')>n('impr'))w.push('Reach cannot be greater than impressions.');
+  if(n('hold')>100||n('kctr')>100||n('khook')>100)w.push('Percentages cannot exceed 100%.');
+  return w;
+}
+const chip=(l,v,t)=>`<div class="chip ${t}">${l}<b>${v}</b></div>`;
+function update(){
+  const A=analyse(),G=A.G;L='en';
+  A.list.forEach(o=>{
+    const el=$(`[data-id="${o.c.id}"]`);if(!el)return;const k=o.k,v=V[o.v];
+    el.querySelector('[data-w]').innerHTML=warns(o.c).map(w=>'⚠️ '+esc(w)).join('<br>');
+    el.querySelector('[data-m]').innerHTML=(k.s>0||k.i>0)?`<span class="badge ${v.c}">${v.e} ${vl(v)}</span><div style="flex-basis:100%;font-size:13px;color:var(--mut)">${vt(v)}</div>`:`<span style="font-size:13px;color:var(--mut)">Enter spend, impressions and clicks to see this ad set's status.</span>`;
+    const au=calc(o.c,1);
+    [['ctr','kctr',fp,tCtr],['cpc','kcpc',fm,tCpc],['cpm','kcpm',fm,()=>'n'],['cpa','kcpa',fm,tCpa],['hook','khook',fp,tHook]].forEach(([m,f,fn,tn])=>{const inp=el.querySelector(`[data-f="${f}"]`);inp.placeholder=au[m]==null?(m==='hook'?'e.g. 20':'auto'):'auto '+fn(au[m]);inp.parentNode.className='kpi '+tn(k[m])});
+  });
+  if(document.activeElement!==$('#cnt'))$('#cnt').value=creatives.length;
+  const has=G.s>0||G.i>0;
+  $('#results').hidden=!has;$('#empty').hidden=has;
+  const R=REC[A.rec],pill=$('#pill');
+  pill.className='pill '+(has?R.c:'n');pill.textContent=has?`${R.e} ${vl(R)}`:'Waiting for data';
+  if(!has)return;
+  const T=(l,v,t='')=>`<div class="tile ${t}"><span>${l}</span><b>${v}</b></div>`;
+  $('#tiles').innerHTML=T('Total Spend',fm(G.s))+T('Total Reach',G.r>0?fi(G.r):'N/A')+T('Total Impressions',fi(G.i))+T('Total Link Clicks',fi(G.k))+T('Total Landing Page Views',fi(G.l))+T('Total Purchases',fi(G.p),G.p>0?'g':'')+
+    T('Average CTR',fp(G.ctr),tCtr(G.ctr))+T('Average CPC',fm(G.cpc),tCpc(G.cpc))+T('Average CPM',fm(G.cpm))+T('LPV → Purchase',fp(G.cvr),tCvr(G.cvr))+T('Average CPA',fm(G.cpa),tCpa(G.cpa))+T('Ad Sets',A.act.length);
+  const C3=(t,ico,o,c,why)=>`<div class="card3 ${o?c:''}"><small>${ico} ${t}</small><h4>${o?esc(nm(o)):'—'}</h4><p>${o?why:'Not available yet'}</p></div>`;
+  const why=o=>o?`${fi(o.k.p)} purchases · CPA ${fm(o.k.cpa)} · CTR ${fp(o.k.ctr)}`:'';
+  $('#trio').innerHTML=C3('Best Creative','🏆',A.best,'g',why(A.best))+C3('Creative to Watch','⚠️',A.watch,'y',why(A.watch))+C3('Weakest Creative','🔴',A.weak,'r',why(A.weak));
+  $('#tb').innerHTML=A.act.map(o=>{const k=o.k,v=V[o.v];return `<tr><td><b>${v.e} ${esc(nm(o))}</b>${o.c.adset.trim()?`<br><small style="color:var(--mut)">${esc(o.c.adset.trim())}</small>`:''}</td><td>${fm(k.s)}</td><td>${fp(k.ctr)}</td><td>${fm(k.cpc)}</td><td>${fp(k.hook)}</td><td>${fi(k.l)}</td><td>${fi(k.p)}</td><td>${fm(k.cpa)}</td><td><span class="badge ${v.c}">${vl(v)}</span></td></tr>`}).join('');
+  $('#rec').className='verdict '+R.c;$('#rec').innerHTML=`<span style="font-size:13px;font-weight:700;color:var(--mut)">Should you continue this campaign?</span><h3>${R.e} ${vl(R)}</h3><p>${vt(R)}</p>`;
+  $('#ins').innerHTML=insights(A).map(s=>`<li>${esc(s)}</li>`).join('');
+  $('#rep').innerHTML=esc(buildReport(reportLang)).replace(/\*([^*\n]+)\*/g,'<strong>$1</strong>');
+}
+
+/* ===== Actions ===== */
+function toast(m){const t=$('#kpiToast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+function setCount(n){n=Math.max(1,Math.min(CFG.MAX_CREATIVES,parseInt(n)||1));while(creatives.length<n)creatives.push(newC());while(creatives.length>n)creatives.pop();renderCards();update()}
+function reset(){creatives=Array.from({length:CFG.DEFAULT_CREATIVES},()=>newC());['seller','product','camp','sd','ed','bud'].forEach(i=>$('#'+i).value='');$('#country').selectedIndex=0;renderCards();update();window.scrollTo({top:0,behavior:'smooth'})}
+function example(){
+  const ex=[['VIDEO 1',7.91,2065,17,17,2,22.81],['VIDEO 2',7.86,1782,24,21,2,13.92],['VIDEO 4',7.84,1154,19,15,1,21.32],['VIDEO 3',8.36,1960,23,21,0,15.51]];
+  creatives=ex.map(e=>newC({name:e[0],adset:'KSA Broad',spend:e[1],impr:e[2],clicks:e[3],lpv:e[4],purch:e[5],khook:e[6]}));
+  $('#camp').value='META ADS TEST';$('#bud').value=5;$('#country').selectedIndex=0;
+  $('#sd').value='2026-10-07';$('#ed').value='2026-10-08';renderCards();update();
+}
+function copyText(t){
+  if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(t);
+  return new Promise((res,rej)=>{const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();
+    try{document.execCommand('copy')?res():rej()}catch(e){rej(e)}a.remove()});
+}
+$('#cards').addEventListener('input',e=>{const f=e.target.dataset.f;if(!f)return;const c=creatives.find(c=>c.id==e.target.closest('.cc').dataset.id);c[f]=e.target.value;update()});
+$('#cards').addEventListener('click',e=>{if(!e.target.matches('[data-rm]'))return;const id=e.target.closest('.cc').dataset.id;if(creatives.length<2)return;creatives=creatives.filter(c=>c.id!=id);renderCards();update()});
+$('#add').onclick=()=>{if(creatives.length>=CFG.MAX_CREATIVES)return toast(`Maximum ${CFG.MAX_CREATIVES} creatives`);creatives.push(newC());renderCards();update();const c=$('#cards').lastElementChild;c&&c.scrollIntoView({behavior:'smooth',block:'center'})};
+$('#info').addEventListener('input',e=>{if(e.target.id!=='cnt')update()});
+$('#cnt').addEventListener('change',e=>setCount(e.target.value));
+$('#ex').onclick=example;
+root.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{reportLang=b.dataset.l;root.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));update()});
+
+creatives=Array.from({length:CFG.DEFAULT_CREATIVES},()=>newC());renderCards();update();
+})();
+</script>
+<script>
+/* ===== THEME (light / dark) =====
+   - the choice is saved in this browser (localStorage "cwi-theme"); first visit = light
+   - to follow the phone/computer setting on the first visit instead, change the fallback in the head script */
+(function(){
+  var KEY = 'cwi-theme', root = document.documentElement;
+  var MOON = '<path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/>';
+  var SUN  = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  function current(){ return root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'; }
+  function paint(){
+    var dark = current() === 'dark';
+    var btns = document.querySelectorAll('.theme-toggle');
+    for (var i = 0; i < btns.length; i++){
+      var b = btns[i], svg = b.querySelector('svg');
+      if (svg) svg.innerHTML = dark ? SUN : MOON;
+      b.setAttribute('aria-pressed', String(dark));
+      var label = dark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن';
+      b.setAttribute('aria-label', label); b.title = label;
+    }
+  }
+  window.setSiteTheme = function(t){
+    t = (t === 'dark') ? 'dark' : 'light';
+    root.classList.add('theme-anim');
+    if (t === 'dark') root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+    try { localStorage.setItem(KEY, t); } catch(e) {}
+    paint();
+    document.dispatchEvent(new CustomEvent('sitethemechange', { detail: t }));
+    setTimeout(function(){ root.classList.remove('theme-anim'); }, 350);
+  };
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.theme-toggle');
+    if (!b) return;
+    e.preventDefault();
+    window.setSiteTheme(current() === 'dark' ? 'light' : 'dark');
+  });
+  paint();
+})();
+</script>
+<script id="cod-flags">
+(function(){
+  var FLAGS = {"AE": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#fff\"/><rect width=\"60\" height=\"13.34\" fill=\"#00732f\"/><rect y=\"26.67\" width=\"60\" height=\"13.33\" fill=\"#111\"/><rect width=\"15\" height=\"40\" fill=\"#e8112d\"/></svg>", "SA": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#006c35\"/><path d=\"M13 14.5c2-3.4 4-3.4 5 0s3 3.4 5 0 3-3.4 5 0 3 3.4 5 0 3-3.4 5 0 3 3.4 4 1\" fill=\"none\" stroke=\"#fff\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M19 21h22\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\"/><path d=\"M12 29l4.5-1.3H44v2.6H16.5z\" fill=\"#fff\"/><rect x=\"43\" y=\"25.8\" width=\"2.2\" height=\"6.4\" rx=\"1\" fill=\"#fff\"/><rect x=\"45\" y=\"27.9\" width=\"5\" height=\"2.2\" rx=\"1\" fill=\"#fff\"/></svg>", "KW": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#fff\"/><rect width=\"60\" height=\"13.34\" fill=\"#007a3d\"/><rect y=\"26.67\" width=\"60\" height=\"13.33\" fill=\"#ce1126\"/><path d=\"M0 0L15 13.34V26.67L0 40z\" fill=\"#111\"/></svg>", "QA": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#8a1538\"/><path d=\"M0 0H16L24 2.22L16 4.44L24 6.67L16 8.89L24 11.11L16 13.33L24 15.56L16 17.78L24 20.0L16 22.22L24 24.44L16 26.67L24 28.89L16 31.11L24 33.33L16 35.56L24 37.78L16 40.0H0z\" fill=\"#fff\"/></svg>", "OM": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#fff\"/><rect y=\"13.34\" width=\"60\" height=\"13.33\" fill=\"#db161b\"/><rect y=\"26.67\" width=\"60\" height=\"13.33\" fill=\"#008000\"/><rect width=\"20\" height=\"40\" fill=\"#db161b\"/><g fill=\"none\" stroke=\"#fff\" stroke-width=\"1.2\"><circle cx=\"10\" cy=\"8\" r=\"3.6\"/><path d=\"M6.4 11.6l7.2-7.2M13.6 11.6L6.4 4.4\"/></g></svg>", "BH": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#ce1126\"/><path d=\"M0 0H16L24 4.0L16 8.0L24 12.0L16 16.0L24 20.0L16 24.0L24 28.0L16 32.0L24 36.0L16 40.0H0z\" fill=\"#fff\"/></svg>", "IQ": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 60 40\"><rect width=\"60\" height=\"40\" fill=\"#fff\"/><rect width=\"60\" height=\"13.34\" fill=\"#ce1126\"/><rect y=\"26.67\" width=\"60\" height=\"13.33\" fill=\"#111\"/><path d=\"M16 21c1.6-3.6 3.2-3.6 4.8 0s3.2 3.6 4.8 0 3.2-3.6 4.8 0 3.2 3.6 4.8 0 3.2-3.6 4.8 0 3.2 3.6 3.8 1\" fill=\"none\" stroke=\"#007a3d\" stroke-width=\"1.8\" stroke-linecap=\"round\"/></svg>"};
+  var NAMES = {'saudi arabia':'SA','ksa':'SA','saudi':'SA','uae':'AE','united arab emirates':'AE','kuwait':'KW','qatar':'QA','oman':'OM','bahrain':'BH','iraq':'IQ'};
+  function src(code){ return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(FLAGS[code]); }
+  function flagImg(code){ var i = document.createElement('img'); i.className = 'cf-flag'; i.alt = ''; i.src = src(code); i.setAttribute('draggable','false'); return i; }
+  function clean(t){ return String(t).replace(/[\uD83C][\uDDE6-\uDDFF]/g,'').replace(/\s+/g,' ').trim(); }
+  function codeOf(t){ return NAMES[clean(t).toLowerCase()] || ''; }
+
+  /* static flags (login preview) */
+  [].forEach.call(document.querySelectorAll('[data-flag]'), function(el){
+    var c = el.getAttribute('data-flag'); if(FLAGS[c]){ el.textContent = ''; el.appendChild(flagImg(c)); }
+  });
+
+  var openPop = null;
+  function isDark(btn){
+    var h = document.documentElement.getAttribute('data-theme') === 'dark';
+    var a = btn.closest('#simApp'); var b = btn.closest('#kpiApp');
+    return h || (a && a.getAttribute('data-theme') === 'dark') || (b && b.getAttribute('data-theme') === 'dark');
+  }
+  function closeAny(){ if(openPop){ openPop(); } }
+
+  function enhance(sel){
+    if(!sel || sel.getAttribute('data-cf')) return;
+    sel.setAttribute('data-cf','1');
+    var host = document.createElement('span'); host.className = 'cf-host'; host.style.cssText = 'display:block;width:100%';
+    var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'cf-btn';
+    btn.setAttribute('aria-haspopup','listbox'); btn.setAttribute('aria-expanded','false'); btn.setAttribute('aria-label','Country');
+    host.appendChild(btn);
+    sel.parentNode.insertBefore(host, sel.nextSibling);
+    sel.style.display = 'none'; sel.setAttribute('aria-hidden','true'); sel.tabIndex = -1;
+
+    function chevron(){
+      var ns='http://www.w3.org/2000/svg', v=document.createElementNS(ns,'svg'); v.setAttribute('viewBox','0 0 12 12'); v.setAttribute('class','cf-chev'); v.setAttribute('aria-hidden','true');
+      var p=document.createElementNS(ns,'path'); p.setAttribute('d','M2 4.2l4 4 4-4'); v.appendChild(p); return v;
+    }
+    function sync(){
+      var o = sel.options[sel.selectedIndex]; var txt = o ? o.text : ''; var code = codeOf(txt);
+      btn.textContent = '';
+      btn.classList.toggle('cf-ph', !code);
+      if(code && btn.closest('#kpiApp')){ btn.appendChild(flagImg(code)); }
+      var t = document.createElement('span'); t.className = 'cf-txt'; t.textContent = clean(txt); btn.appendChild(t);
+      if(code && !btn.closest('#kpiApp')){ btn.appendChild(flagImg(code)); }
+      btn.appendChild(chevron());
+    }
+    /* keep the button in sync when the page's own code sets the value (reset buttons etc.) */
+    ['value','selectedIndex'].forEach(function(prop){
+      var d = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, prop);
+      Object.defineProperty(sel, prop, {configurable:true, get:function(){ return d.get.call(this); }, set:function(v){ d.set.call(this, v); sync(); }});
+    });
+    sync();
+
+    var pop = null, act = -1;
+    function items(){ return pop ? pop.querySelectorAll('.cf-opt') : []; }
+    function setAct(i){
+      var it = items(); if(!it.length) return;
+      act = (i + it.length) % it.length;
+      [].forEach.call(it, function(el, k){ el.classList.toggle('cf-act', k === act); });
+      it[act].scrollIntoView({block:'nearest'});
+    }
+    function place(){
+      if(!pop) return;
+      var r = btn.getBoundingClientRect();
+      var w = Math.max(r.width, 210); pop.style.width = w + 'px';
+      var left = btn.closest('#simApp') ? r.right - w : r.left;
+      left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+      var h = pop.offsetHeight, top = r.bottom + 6;
+      if(top + h > window.innerHeight - 8 && r.top > h + 14) top = r.top - h - 6;
+      pop.style.left = left + 'px'; pop.style.top = top + 'px';
+    }
+    function close(focus){
+      if(!pop) return;
+      document.removeEventListener('pointerdown', onOut, true);
+      window.removeEventListener('resize', onWin); window.removeEventListener('scroll', onWin, true);
+      pop.remove(); pop = null; act = -1; openPop = null; btn.setAttribute('aria-expanded','false');
+      if(focus) btn.focus();
+    }
+    function onOut(e){ if(pop && !pop.contains(e.target) && !btn.contains(e.target)) close(false); }
+    function onWin(e){ if(pop && e && e.target && pop.contains(e.target)) return; close(false); }
+    function choose(i){
+      sel.selectedIndex = i;
+      sel.dispatchEvent(new Event('input', {bubbles:true}));
+      sel.dispatchEvent(new Event('change', {bubbles:true}));
+      close(true);
+    }
+    function open(){
+      closeAny();
+      pop = document.createElement('div'); pop.className = 'cf-pop' + (isDark(btn) ? ' cf-dark' : ''); pop.setAttribute('role','listbox');
+      [].forEach.call(sel.options, function(o, i){
+        var code = codeOf(o.text);
+        var li = document.createElement('div'); li.className = 'cf-opt' + (code ? '' : ' cf-none'); li.setAttribute('role','option');
+        li.setAttribute('aria-selected', i === sel.selectedIndex ? 'true' : 'false');
+        if(code) li.appendChild(flagImg(code));
+        var t = document.createElement('span'); t.textContent = clean(o.text); li.appendChild(t);
+        if(i === sel.selectedIndex){
+          var ns='http://www.w3.org/2000/svg', v=document.createElementNS(ns,'svg'); v.setAttribute('viewBox','0 0 16 16'); v.setAttribute('class','cf-ok');
+          var p=document.createElementNS(ns,'path'); p.setAttribute('d','M3.5 8.5l3 3 6-7'); v.appendChild(p); li.appendChild(v);
+        }
+        li.addEventListener('click', function(){ choose(i); });
+        li.addEventListener('mousemove', function(){ setAct(i); });
+        pop.appendChild(li);
+      });
+      document.body.appendChild(pop);
+      btn.setAttribute('aria-expanded','true');
+      place(); setAct(sel.selectedIndex < 0 ? 0 : sel.selectedIndex);
+      document.addEventListener('pointerdown', onOut, true);
+      window.addEventListener('resize', onWin); window.addEventListener('scroll', onWin, true);
+      openPop = function(){ close(false); };
+    }
+    btn.addEventListener('click', function(){ pop ? close(false) : open(); });
+    btn.addEventListener('keydown', function(e){
+      var k = e.key;
+      if(!pop){
+        if(k === 'ArrowDown' || k === 'ArrowUp'){ e.preventDefault(); open(); }
+        return;
+      }
+      if(k === 'Escape'){ e.preventDefault(); close(true); }
+      else if(k === 'ArrowDown'){ e.preventDefault(); setAct(act + 1); }
+      else if(k === 'ArrowUp'){ e.preventDefault(); setAct(act - 1); }
+      else if(k === 'Home'){ e.preventDefault(); setAct(0); }
+      else if(k === 'End'){ e.preventDefault(); setAct(items().length - 1); }
+      else if(k === 'Enter' || k === ' '){ e.preventDefault(); if(act >= 0) choose(act); }
+      else if(k === 'Tab'){ close(false); }
+    });
+  }
+  enhance(document.getElementById('country'));
+  enhance(document.getElementById('sim-country'));
+})();
+</script>
+</body>
+</html>
